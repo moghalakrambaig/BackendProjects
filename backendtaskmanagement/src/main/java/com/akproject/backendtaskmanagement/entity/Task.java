@@ -11,17 +11,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"email"})
-})
-public class Users {
+@Table(name = "task")
+public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "name", nullable = false)
-    private String name;
-    @Column(name = "email", nullable = false)
-    private String email;
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Column(name = "task_name", nullable = false)
+    private String taskName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "users_id", referencedColumnName = "id")
+    private Users users;
 }
