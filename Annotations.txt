@@ -1,2 +1,0 @@
-@Transient
-This annotation is used to ignore a column in a database. It will not be considered in Entity.
