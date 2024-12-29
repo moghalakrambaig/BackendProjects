@@ -1,0 +1,2 @@
+Response Entity class:
+ResponseEntity is the class in the Spring Framework that represents the entire HTTP response, including the status code, headers, and body. It is a part of the org.springframework.http package and is a powerful tool for controlling the output of the RESTful services.
