@@ -40,9 +40,9 @@ public class TaskServiceImpl implements TaskService {
         Users user = usersRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(String.format("User Id %d not found", userId))
         );
-        List<Task> tasks = taskRepository.findAllByUserId(userId);
+        List<Task> tasks = taskRepository.findAllByUsersId(userId);
         return tasks.stream().map(
-                task -> modelMapper.map(tasks, TaskDto.class)
+                task -> modelMapper.map(task, TaskDto.class)
         ).toList();
     }
 }
