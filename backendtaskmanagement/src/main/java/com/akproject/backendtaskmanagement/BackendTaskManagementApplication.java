@@ -7,13 +7,12 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class BackendTaskManagementApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(BackendTaskManagementApplication.class, args);
     }
 
     @Bean
-    public ModelMapper modelMapper(){
+    public ModelMapper modelMapper() {
         return new ModelMapper();
     }
 }
