@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class TaskController {
@@ -15,7 +17,12 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping("/{userId}/tasks")
-    public ResponseEntity<TaskDto> saveTask(@PathVariable("userId") Long userId, @RequestBody TaskDto taskDto){
+    public ResponseEntity<TaskDto> saveTask(@PathVariable("userId") Long userId, @RequestBody TaskDto taskDto) {
         return new ResponseEntity<>(taskService.saveTask(userId, taskDto), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/tasks/{userId}")
+    public ResponseEntity<List<TaskDto>> getAllTasks(@PathVariable("userId") Long userId) {
+        return new ResponseEntity<>(taskService.getAllTasks(userId), HttpStatus.OK);
     }
 }
