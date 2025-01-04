@@ -1,0 +1,8 @@
+Ways to secure APIs
+Form Based Authentication
+Basic Authentication
+JWT Authentication
+OAuth Authentication
+
+
+JWT Authentication
