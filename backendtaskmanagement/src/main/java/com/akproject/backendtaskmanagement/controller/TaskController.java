@@ -25,4 +25,15 @@ public class TaskController {
     public ResponseEntity<List<TaskDto>> getAllTasks(@PathVariable("userId") Long userId) {
         return new ResponseEntity<>(taskService.getAllTasks(userId), HttpStatus.OK);
     }
+
+    @GetMapping("{userId}/tasks/{taskId}")
+    public ResponseEntity<TaskDto> getTask(@PathVariable("userId") Long userId, @PathVariable("taskId") Long taskId) {
+        return new ResponseEntity<>(taskService.getTask(userId, taskId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{userId}/tasks/{taskId}")
+    public ResponseEntity<String> deleteTask(@PathVariable("userId") Long userId, @PathVariable("taskId") Long taskId) {
+        taskService.deleteTask(userId, taskId);
+        return new ResponseEntity<>("Task deleted successfully", HttpStatus.OK);
+    }
 }
