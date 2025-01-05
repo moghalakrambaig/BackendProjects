@@ -55,7 +55,7 @@ public class TaskServiceImpl implements TaskService {
         );
 
         Task task = taskRepository.findById(taskId).orElseThrow(
-                () -> new TaskNotFoundException(String.format("Task Id %d not found", taskId, userId))
+                () -> new TaskNotFoundException(String.format("Task Id %d not found", taskId))
         );
         if (user.getId() != task.getUsers().getId()) {
             throw new APIException(String.format("Task Id %d does not belong to user Id %d", taskId, userId));
@@ -70,7 +70,7 @@ public class TaskServiceImpl implements TaskService {
         );
 
         Task task = taskRepository.findById(taskId).orElseThrow(
-                () -> new TaskNotFoundException(String.format("Task Id %d not found", taskId, userId))
+                () -> new TaskNotFoundException(String.format("Task Id %d not found", taskId))
         );
         taskRepository.deleteById(taskId);
     }

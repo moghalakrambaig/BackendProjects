@@ -6,3 +6,80 @@ OAuth Authentication
 
 
 JWT Authentication
+Validate User Credentials
+Generate JWT for authenticated user
+Handle API's using valid Token
+
+add dependency
+<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+Create a security package
+Create a class named as SecurityConfig
+add @Configuration and @EnableWebSecurity annotations
+
+create two bean methods
+ @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.authorizeHttpRequests((authorize) -> authorize.anyRequest()
+                .authenticated()).httpBasic(Customizer.withDefaults());
+
+        return httpSecurity.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+AuthenticationManager is used to validate username and password entered by user with the username and password stored in the database
+
+Create a endpoint in Usercontroller
+ @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody LoginDto loginDto) {
+	// take the email, password from user and authenticate
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return new ResponseEntity<>("User logged in Successfully", HttpStatus.OK);
+    }
+
+
+create a security package
+create a CustomUserDetailsServce class which implemets UserDetailsService which has a method loadUserByUsername(String username)
+This method loads the data based on the email provided
+Create a method findByEmail in UserRepo
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+    @Autowired
+    private UsersRepository usersRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Users user = usersRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException(String.format("Email %s Not Found", email))
+        );
+        Set<String> roles = new HashSet<String>();
+        roles.add("ROLE_ADMIN");
+        return new User(user.getEmail(), user.getPassword(), userAuthorities(roles));
+    }
+
+    private Collection<? extends GrantedAuthority> userAuthorities(Set<String> roles) {
+        return roles.stream().map(
+                        role -> new SimpleGrantedAuthority(role))
+                .collect(Collectors.toList());
+    }
+}
+
+To assign roles to the API's
+add @PreAuthorize(value = "ROLE_ADMIN") annotation on the controller methods
+
+
+Disable Securityfor authentication related requests
+.antMatchers("/api/users/**)
+
+AuthenticationManager validates encoded password with entered password
+So we need to encode the password while storing/registering the password itself
