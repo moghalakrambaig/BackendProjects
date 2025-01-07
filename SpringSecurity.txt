@@ -83,3 +83,28 @@ Disable Securityfor authentication related requests
 
 AuthenticationManager validates encoded password with entered password
 So we need to encode the password while storing/registering the password itself
+
+
+Generate JWT for authenticated user
+=======================================
+JSON Web Token (JWT)
+
+JWT.io official website
+
+Example token:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+3 parts in JWT
+Header - What type of algorithm and token type
+Payload - Data
+Signature - pattern of the token
+
+add maven dependency of JWT
+<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt</artifactId>
+    <version>0.12.6</version>
+</dependency>
