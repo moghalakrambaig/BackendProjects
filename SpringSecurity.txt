@@ -7,6 +7,12 @@ OAuth Authentication
 
 JWT Authentication
 Validate User Credentials
+3 Beans
+SecurityFilterChain - This will authorize all the requests.
+AuthenticationManager - It will authenticate user credentials
+AuthenticationManager is used to validate username and password entered by user with the username and password stored in the database
+it internally implements the inerface UserDetailsService and loads the user details from Database using the entered the email and validate them with the details entered by the user. If the details are valid it will set the authentication to true.
+
 Generate JWT for authenticated user
 Handle API's using valid Token
 
@@ -108,3 +114,60 @@ add maven dependency of JWT
     <artifactId>jjwt</artifactId>
     <version>0.12.6</version>
 </dependency>
+
+
+Create a JwtTokenProvider class in security package
+
+@Component
+public class JwtTokenProvider {
+    public String generateToken(Authentication authentication) {
+        String email = authentication.getName();
+        Date currentDate = new Date();
+        Date expireDate = new Date(currentDate.getTime() + 3600000);
+
+        String token = Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(currentDate)
+                .setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS256, "JWTSecretKeyForTheBackendTaskManagementProject")
+                .compact();
+
+        return token;
+    }
+
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey("JWTSecretKeyForTheBackendTaskManagementProject")
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
+    }
+}
+
+Error: The signing key's size is 72 bits which is not secure enough for the HS256 alogrithm
+Increase the signing key size to >=256 bits 32 bytes
+
+.setSigningKey("JWTSecretKeyForTheBackendTaskManagementProject")
+
+Create a Jwt token reponse class in payload package to return a JSON object in the contoller
+
+public class JwtTokenResponse {
+    private String token;
+    private String tokenType = "Bearer";
+
+    public JwtTokenResponse(String token) {
+        this.token = token;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+Add the token in controller class in "/login" end point
+
+String token = jwtTokenProvider.generateToken(authentication); //get the token
+        return new ResponseEntity<>(new JwtTokenResponse(token), HttpStatus.OK);
+
+

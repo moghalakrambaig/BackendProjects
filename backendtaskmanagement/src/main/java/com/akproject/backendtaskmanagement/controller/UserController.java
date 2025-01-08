@@ -1,7 +1,9 @@
 package com.akproject.backendtaskmanagement.controller;
 
+import com.akproject.backendtaskmanagement.payload.JwtTokenResponse;
 import com.akproject.backendtaskmanagement.payload.LoginDto;
 import com.akproject.backendtaskmanagement.payload.UsersDto;
+import com.akproject.backendtaskmanagement.secutiry.JwtTokenProvider;
 import com.akproject.backendtaskmanagement.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,17 +23,22 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/register")
     public ResponseEntity<UsersDto> createUser(@RequestBody UsersDto usersDto) {
         return new ResponseEntity<>(usersService.createUser(usersDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<JwtTokenResponse> loginUser(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
         );
+        System.out.println(authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User logged in Successfully", HttpStatus.OK);
+        String token = jwtTokenProvider.generateToken(authentication); //get the token
+        return new ResponseEntity<>(new JwtTokenResponse(token), HttpStatus.OK);
     }
 }
