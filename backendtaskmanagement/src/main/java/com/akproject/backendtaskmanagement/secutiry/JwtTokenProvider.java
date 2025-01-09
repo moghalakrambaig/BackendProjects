@@ -1,5 +1,6 @@
 package com.akproject.backendtaskmanagement.secutiry;
 
+import com.akproject.backendtaskmanagement.exceptions.APIException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,5 +34,17 @@ public class JwtTokenProvider {
                 .getBody();
 
         return claims.getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey("JWTSecretKeyForTheBackendTaskManagementProject")
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            throw new APIException("Token Issue" + e.getMessage());
+        }
     }
 }
