@@ -170,4 +170,59 @@ Add the token in controller class in "/login" end point
 String token = jwtTokenProvider.generateToken(authentication); //get the token
         return new ResponseEntity<>(new JwtTokenResponse(token), HttpStatus.OK);
 
+Handle API's using valid Token
+===================================
 
+To authenticate every request using a valid token
+
+create a JwtAuthenticatioFiletr calss in security package
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        //get the token from headers
+        String token = getToken(request);
+        //check the token
+        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getEmailFromToken(token);
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    private String getToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+        return null;
+    }
+}
+
+Add validate token method in JwtTokenProvider
+public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey("JWTSecretKeyForTheBackendTaskManagementProject")
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            throw new APIException("Token Issue" + e.getMessage());
+        }
+    }
+
+In SecurityConfig file add 
+http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
